@@ -28,12 +28,12 @@ Se um veículo com a placa especificada for encontrado, o servidor irá retornar
   - municipio
   - uf
 - plain_response
-  - objeto HTTPart::Response crú
+  - objeto HTTParty::Response crú
 
 
 ## Por que fazer um cliente do SINESP?
 
-Não sabemos o porquê, mas o governo não mantém uma API pública para este serviço. A única maneira de acessar os dados é acessando o site do SINESP e respondendo a perguntas de verificação (captchas) para cada uma das requisições.
+O governo não mantém uma API pública para este serviço. A única maneira de acessar os dados é acessando o site do SINESP de forma automatizada como o app o faz
 
 ### Utilização normal
 

@@ -8,14 +8,11 @@ class SinespClient
   URL = 'cidadao.sinesp.gov.br'
   SECRET = '#8.1.0#Mw6HqdLgQsX41xAGZgsF'
 
-  def initialize(proxy_address=nil, proxy_port=nil)
-    # TODO use A Proxy if provided
-    # # SINESP only accepts national web requests. If you don't have a valid
-    # # Brazilian IP address you could use a web proxy (SOCKS5).
-    # @proxies = nil
-    # if proxy_address && proxy_port
-    #   @proxies = {"https": "https://#{proxy_address}:#{proxy_port}"}
-    # end
+  def initialize(proxies_options = {})
+    # SINESP only accepts national web requests. If you don't have a valid
+    # Brazilian IP address you could use a web proxy (SOCKS5).
+    # accepted (not required) options: { 'proxy_address', 'proxy_port', 'proxy_user', 'proxy_pwd' }
+    @proxies = proxies_options
 
     # Read and store XML template for our HTTP request body.
     body_file = File.open('body.xml')
@@ -42,9 +39,7 @@ class SinespClient
     # - city
     # - state
     response = self.request(plate)
-    # if not response:
-    #   return dict()
-
+    return error unless response
     self.parse(response)
   end
 
@@ -64,6 +59,10 @@ class SinespClient
       'Connection' => 'close'
     }
     return HTTParty.post(url, {
+        http_proxyaddr: @proxies['proxy_address'],
+        http_proxyport: @proxies['proxy_port'],
+        http_proxyuser: @proxies['proxy_user'],
+        http_proxypass: @proxies['proxy_pwd'],
         body: data,
         headers: headers,
         cookies: cookies,
@@ -119,7 +118,13 @@ class SinespClient
 
   def captcha_cookie
     # Performs a captcha request and return the cookie.
-    cookies_request = HTTParty.get('https://sinespcidadao.sinesp.gov.br/sinesp-cidadao/captchaMobile.png', :verify => false)
+    cookies_request = HTTParty.get('https://sinespcidadao.sinesp.gov.br/sinesp-cidadao/captchaMobile.png', {
+          http_proxyaddr: @proxies['proxy_address'],
+          http_proxyport: @proxies['proxy_port'],
+          http_proxyuser: @proxies['proxy_user'],
+          http_proxypass: @proxies['proxy_pwd'],
+          :verify => false
+        })
     cookies_str = cookies_request.headers['set-cookie']
     cookies_hsh = Hash[cookies_str.split(';').map {|elem| elem.split '='}]
 
@@ -132,6 +137,12 @@ class SinespClient
     {
       'data'=> response.dig("Envelope", "Body", "getStatusResponse", "return"),
       'plain_response' => response
+    }
+  end
+
+  def error
+    {
+      'message' => 'An error occured! Try Again.'
     }
   end
 

@@ -141,6 +141,7 @@ class SinespClient
   end
 
   def error
+    # Retorna mensagem em caso de erro
     {
       'message' => 'An error occured! Try Again.'
     }

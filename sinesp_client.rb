@@ -45,7 +45,7 @@ class SinespClient
     # if not response:
     #   return dict()
 
-    return self.parse(response)
+    self.parse(response)
   end
 
   def request(plate)
@@ -82,7 +82,7 @@ class SinespClient
     xml.xpath("//l")[0].content = self.date
     xml.xpath("//a")[0].content = plate
 
-    return xml
+    xml
   end
 
   def token(plate)
@@ -93,30 +93,28 @@ class SinespClient
     plate = plate.encode!(Encoding::UTF_8)
 
     digest = OpenSSL::Digest.new('sha1')
-    hmac = OpenSSL::HMAC.hexdigest(digest, plate_and_secret, plate)
-    return hmac
+    OpenSSL::HMAC.hexdigest(digest, plate_and_secret, plate)
   end
 
   def rand_latitude
     # Generates random latitude.
-    return sprintf('%.7f', self.rand_coordinate - 38.5290245 )
+    sprintf('%.7f', self.rand_coordinate - 38.5290245 )
   end
 
   def rand_longitude
     # Generates random longitude.
-    return sprintf('%.7f', self.rand_coordinate - 3.7506985 )
+    sprintf('%.7f', self.rand_coordinate - 3.7506985 )
   end
 
   def rand_coordinate(radius=2000)
     # Generates random seed for latitude and longitude coordinates.
     seed = radius/111000.0 * Math.sqrt(Random.new.rand)
-    seed = seed * Math.sin(2 * 3.141592654 * Random.new.rand)
-    return seed
+    seed * Math.sin(2 * 3.141592654 * Random.new.rand)
   end
 
   def date
     # Returns the current date formatted as yyyy-MM-dd HH:mm:ss
-    return Time.now.strftime('%Y-%m-%d %H:%M:%S')
+    Time.now.strftime('%Y-%m-%d %H:%M:%S')
   end
 
   def captcha_cookie
@@ -125,14 +123,16 @@ class SinespClient
     cookies_str = cookies_request.headers['set-cookie']
     cookies_hsh = Hash[cookies_str.split(';').map {|elem| elem.split '='}]
 
-    return { 'JSESSIONID' => cookies_hsh['JSESSIONID'] }
+    { 'JSESSIONID' => cookies_hsh['JSESSIONID'] }
   end
 
 
-
-
-  def _parse(response)
-    # Parses XML result from HTTP response.
+  def parse(response)
+    # Parses result from HTTP response.
+    {
+      'data'=> response.dig("Envelope", "Body", "getStatusResponse", "return"),
+      'plain_response' => response
+    }
   end
 
 end

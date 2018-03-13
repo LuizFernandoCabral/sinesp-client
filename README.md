@@ -1,8 +1,8 @@
-# sinesp-client
+# Sinesp-Client
 
 ## Agradecimentos
-### Versão ruby para https://github.com/victor-torres/sinesp-client
-### Agradecimentos ao mesmo, por favor refenciar acima
+###### Versão ruby para https://github.com/victor-torres/sinesp-client
+###### Agradecimentos ao mesmo, por favor refenciar acima
 
 ## O que é o SINESP
 
